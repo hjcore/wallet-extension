@@ -1,0 +1,10 @@
+
+{
+  "stylelintIntegration": true,
+  "eslintIntegration": true,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "insertPragma": false,
+  "arrowParens": "avoid"
+}

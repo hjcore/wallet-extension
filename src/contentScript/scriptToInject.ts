@@ -15,6 +15,7 @@
         },
         window.location.origin
       )
+
       // Receive broadcast when transaction is done
       const channel = new BroadcastChannel('gotabit')
       const listener = async (e: any) => {
@@ -26,6 +27,7 @@
         }
         channel.removeEventListener('message', listener)
       }
+
       channel.addEventListener('message', listener)
     }),
 }

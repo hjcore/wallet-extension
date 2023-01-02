@@ -2,6 +2,7 @@ import qs from 'query-string'
 
 const openChromeExtension = (params: any) => {
   const query: any = { fromWeb: true }
+
   Object.keys(params).forEach((key) => {
     if (typeof params[key] === 'string') {
       query[key] = params[key]
@@ -22,6 +23,7 @@ const openChromeExtension = (params: any) => {
       if (window) {
         setTimeout(
           () =>
+
           // @ts-ignore
           chrome.windows.update(window.id, {
               width: 520,
