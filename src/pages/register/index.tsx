@@ -1,15 +1,27 @@
 import Button from '@mui/material/Button'
 
-import { useAccountContext } from 'src/contexts/AccountContext'
+import { getAccountStore } from 'src/store/account'
+import { setNetwork, NetworkStore } from 'src/store/network'
 
 const test_mnemonic =
   'dinner proud piano mention silk plunge forest fold trial duck electric define'
 
-function RegisterPage() {
-  const { importAccount } = useAccountContext()
+const AccountStore = await getAccountStore()
 
-  const handleImport = () => {
-    importAccount(test_mnemonic)
+function RegisterPage() {
+  const handleImport = async () => {
+    await AccountStore.set({
+      mnemonic: test_mnemonic,
+    })
+
+    setNetwork('dev')
+    console.log('--------imported')
+  }
+
+  const clearAccountStore = async () => {
+    AccountStore.clear()
+    NetworkStore.clear()
+    console.log('--------cleared')
   }
 
   return (
@@ -17,6 +29,7 @@ function RegisterPage() {
       <Button variant="contained" onClick={handleImport}>
         import existing account
       </Button>
+      <Button onClick={clearAccountStore}>Clear Account storage</Button>
     </div>
   )
 }

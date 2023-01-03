@@ -7,7 +7,7 @@ import {
 } from 'react'
 import { LocalWallet } from '@gotabit/wallet-local'
 import { GotabitClient } from '@gotabit/client'
-import { useNavigate } from 'react-router-dom'
+import browser from 'webextension-polyfill'
 
 import { NetworkStore } from 'src/store/network'
 import {
@@ -19,59 +19,76 @@ import {
 interface IAccountContext extends AccountStoreData {
   refreshBalances: () => void
   client?: GotabitClient
-  importAccount: (mnemonic: string) => void
 }
 
-const AccountContext = createContext<IAccountContext | undefined>(undefined)
+const defaultAccountContext: IAccountContext = {
+  privateKey: '',
+  mnemonic: '',
+  tokens: [],
+  gtbBalance: '',
+  account: '',
+  accountList: [],
+  refreshBalances: () => void 0,
+}
+
+const AccountContext = createContext<IAccountContext>(defaultAccountContext)
 
 const AccountStore = await getAccountStore()
 const accountDataPersist = await AccountStore.get()
 const networkDataPersist = await NetworkStore.get()
 
+console.log('---accountDataPersist', accountDataPersist)
+
+async function queryBalance({
+  client,
+  account,
+  tokens,
+}: {
+  client: GotabitClient
+  account: string
+  tokens: TokenWrapper<Token>[]
+}) {
+  const stargateClient = await client.stargateClient()
+  const wasmClient = await client.wasmClient()
+
+  const balance = await stargateClient.getBalance(
+    account,
+    networkDataPersist.config.coinMinimalDenom
+  )
+
+  const tokensBalances: Array<TokenWrapper<Cw20Token>> = []
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i] as Cw20Token
+    const tokenBalance = await wasmClient
+      .queryContractSmart(token.token, {
+        balance: {
+          address: token.token,
+        },
+      })
+      .catch(console.error)
+
+    tokensBalances.push({
+      ...token,
+      tokenType: 'cw20',
+      balance: tokenBalance?.balance ?? '',
+    })
+  }
+
+  return {
+    gtbBalance: balance,
+    tokensBalances,
+  }
+}
+
 export function AccountProvider({ children }: ChildrenProps) {
-  const navigate = useNavigate()
-  const [accountData, setAccountData] =
-    useState<AccountStoreData>(accountDataPersist)
+  const [accountData, setAccountData] = useState<AccountStoreData>({
+    ...defaultAccountContext,
+    ...accountDataPersist,
+  })
 
   // const [wallet, setWallet] = useState<LocalWallet>()
   const [client, setClient] = useState<GotabitClient>()
-
-  const queryBalance = useCallback(
-    async (client: GotabitClient) => {
-      const stargateClient = await client.stargateClient()
-      const wasmClient = await client.wasmClient()
-
-      const balance = await stargateClient.getBalance(
-        accountData.account,
-        networkDataPersist.config.coinMinimalDenom
-      )
-
-      const tokensBalances: Array<TokenWrapper<Cw20Token>> = []
-
-      for (let i = 0; i < accountData.tokens.length; i++) {
-        const token = accountData.tokens[i] as Cw20Token
-        const tokenBalance = await wasmClient
-          .queryContractSmart(token.token, {
-            balance: {
-              address: token.token,
-            },
-          })
-          .catch(console.error)
-
-        tokensBalances.push({
-          ...token,
-          tokenType: 'cw20',
-          balance: tokenBalance?.balance ?? '',
-        })
-      }
-
-      return {
-        gtbBalance: balance,
-        tokensBalances,
-      }
-    },
-    [accountData.account, accountData.tokens]
-  )
 
   const initWallet = useCallback(
     async (mnemonic?: string) => {
@@ -82,8 +99,14 @@ export function AccountProvider({ children }: ChildrenProps) {
 
       const accounts = await wallet.getAccounts()
       const account = accountData.account || accounts[0].address
+
+      console.log('---accounts', accounts)
       const client = await GotabitClient.init(wallet, networkDataPersist.type)
-      const { gtbBalance, tokensBalances } = await queryBalance(client)
+      const { gtbBalance, tokensBalances } = await queryBalance({
+        client,
+        account,
+        tokens: accountData.tokens,
+      })
       const privateKey = await wallet.getPrivateKey()
       const accountList = accounts.filter(_ => {
         return {
@@ -105,38 +128,36 @@ export function AccountProvider({ children }: ChildrenProps) {
 
       // setWallet(wallet)
     },
-    [accountData.account, accountData.mnemonic, queryBalance]
+    [accountData.account, accountData.mnemonic, accountData.tokens]
   )
 
   const refreshBalances = useCallback(async () => {
     if (!client) return
-    const { gtbBalance, tokensBalances } = await queryBalance(client)
+    const { gtbBalance, tokensBalances } = await queryBalance({
+      client,
+      account: accountData.account,
+      tokens: accountData.tokens,
+    })
 
     setAccountData({
       ...accountData,
       gtbBalance: gtbBalance.amount,
       tokens: tokensBalances,
     })
-  }, [accountData, client, queryBalance])
-
-  const importAccount = useCallback(
-    async (mnemonic: string) => {
-      await AccountStore.set({
-        mnemonic,
-      })
-      await initWallet(mnemonic)
-    },
-    [initWallet]
-  )
+  }, [accountData, client])
 
   useEffect(() => {
     if (accountDataPersist && accountDataPersist.mnemonic) {
       if (client) return
       initWallet()
     } else {
-      navigate('/register')
+      browser.tabs.create({
+        url: '/index.html#/register',
+      })
     }
-  }, [client, initWallet, navigate])
+  }, [client, initWallet])
+
+  console.log('=====accountData', accountData, networkDataPersist)
 
   return (
     <AccountContext.Provider
@@ -144,7 +165,6 @@ export function AccountProvider({ children }: ChildrenProps) {
         ...accountData,
         client,
         refreshBalances,
-        importAccount,
       }}
     >
       {children}

@@ -1,12 +1,16 @@
 import { useNavigate } from 'react-router-dom'
+import browser from 'webextension-polyfill'
+
+import { AccountProvider } from 'src/contexts/AccountContext'
+
+import Account from './Account'
 
 function WalletPage() {
   const navigate = useNavigate()
 
   const handleAddAccount = () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('webextension-polyfill').tabs.create({
+      browser.tabs.create({
         url: '/index.html#/register',
       })
     } catch (error) {
@@ -15,10 +19,11 @@ function WalletPage() {
   }
 
   return (
-    <div>
+    <AccountProvider>
       <p>Wallet page</p>
       <button onClick={handleAddAccount}>Add account</button>
-    </div>
+      <Account />
+    </AccountProvider>
   )
 }
 

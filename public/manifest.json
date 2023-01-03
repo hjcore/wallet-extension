@@ -10,18 +10,13 @@
     "default_icon": "logo512.png",
     "default_popup": "index.html"
   },
-  "externally_connectable": {
-    "matches": ["*://localhost/*", "*://*.gotabit.com/*"]
-  },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": [
-        "contentScript.js"
-      ]
+      "js": ["contentScript.js"]
     }
   ],
   "web_accessible_resources": [
@@ -30,8 +25,5 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": ["storage", "hid"],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  "permissions": ["storage", "hid", "notifications", "identity"]
 }
