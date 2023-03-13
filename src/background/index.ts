@@ -1,7 +1,19 @@
-import openChromeExtension from './misc/openChromeExtension';
+import browser from 'webextension-polyfill'
 
-chrome.runtime.onMessage.addListener(
-  async (request: any, sender: any, sendResponse: (response?: any) => void): Promise<void> => {
-    openChromeExtension(request.data);
-  }
-);
+import { setDefaultAccountData } from 'src/store/account'
+import { setDefaultAddressBookData } from 'src/store/addressBook'
+import { setDefaultNetworkData } from 'src/store/network'
+import { setDefaultTokenData } from 'src/store/token'
+
+import openChromeExtension from './misc/openChromeExtension'
+import { initPrivateServer } from './private'
+import { initTxServer } from './tx'
+
+setDefaultAccountData()
+setDefaultAddressBookData()
+setDefaultNetworkData()
+setDefaultTokenData()
+
+initPrivateServer()
+
+initTxServer()

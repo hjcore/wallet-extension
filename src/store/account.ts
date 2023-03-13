@@ -1,53 +1,34 @@
 import { getBucket } from '@extend-chrome/storage'
 
-import { NetworkStore } from './network'
+import { WalletStatusEnum } from 'src/constants/status'
+
+import { EncryptBaseStore } from './encryptBase'
 
 export interface AccountInfo {
-  account: string
-  tokens: Array<TokenWrapper>
-  privateKey: string
-}
-
-export interface AccountStoreData extends AccountInfo {
-  accountList: AccountInfo[]
-  gtbBalance: string
-  tokens: Array<TokenWrapper>
+  name: string
   mnemonic: string
+  account: string
+  pubKey: string
+  privateKey: string
+  path?: string
 }
 
-export const MainAccountStore = getBucket<AccountStoreData>(
-  'AccountData_main',
-  'local'
+export interface AccountStoreData {
+  accountList: AccountInfo[]
+  currentAccount: AccountInfo
+  walletStatus: WalletStatusEnum
+}
+
+export const AccountEncryptStore = new EncryptBaseStore<AccountStoreData>(
+  'AccountEncryptData'
 )
 
-export const TestAccountStore = getBucket<AccountStoreData>(
-  'AccountData_test',
-  'local'
-)
+export const AccountStore = getBucket<AccountStoreData>('AccountData', 'local')
 
-export const DevAccountStore = getBucket<AccountStoreData>(
-  'AccountData_dev',
-  'local'
-)
-
-export const LocalAccountStore = getBucket<AccountStoreData>(
-  'AccountData_local',
-  'local'
-)
-
-export async function getAccountStore() {
-  const networkStore = await NetworkStore.get('type')
-
-  switch (networkStore.type) {
-    case 'local':
-      return LocalAccountStore
-    case 'dev':
-      return DevAccountStore
-    case 'test':
-      return TestAccountStore
-    case 'main':
-      return MainAccountStore
-    default:
-      return MainAccountStore
-  }
+export function setDefaultAccountData() {
+  AccountStore.set({
+    currentAccount: {} as any,
+    accountList: [],
+    walletStatus: WalletStatusEnum.Empty,
+  })
 }

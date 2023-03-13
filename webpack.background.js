@@ -1,8 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path')
 
+/** @type {import('webpack')} */
 module.exports = {
   entry: './src/background/index.ts',
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -19,7 +21,13 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+    minimize: false,
+  },
   resolve: {
+    alias: {
+      src: path.resolve(__dirname, 'src'),
+    },
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
       crypto: require.resolve('crypto-browserify'),
@@ -31,5 +39,6 @@ module.exports = {
   output: {
     filename: 'background.js',
     path: path.resolve(__dirname, 'build'),
+    libraryTarget: 'umd',
   },
 }
