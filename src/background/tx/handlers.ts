@@ -24,7 +24,7 @@ export class TxClient {
 
     const { currentAccount } = await AccountStore.get()
 
-    const { mnemonic, privateKey } = currentAccount
+    const { mnemonic } = currentAccount
 
     const wallet = await LocalWallet.init({
       mnemonic,
@@ -32,8 +32,6 @@ export class TxClient {
 
     // TODO: update config
     const client = await GotabitClient.init(wallet, 'dev')
-
-    console.log('mnemonic', mnemonic, config)
 
     return { client, wallet }
   }
