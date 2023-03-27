@@ -19,9 +19,9 @@ Builds the app for production to the `build` folder.
 
 ### How to open the extension in browser?
 
--- 1, Run `yarn build` command to build the latest codes.
--- 2, Switch on the `Developer mode` button in your chrome with the [url](chrome://extensions/).
--- 3, Click the `Load unpacked` button and choose the build folder.
--- 4, You can check the extension in your extension list.
+#### -- 1, Run `yarn build` command to build the latest codes.
+#### -- 2, Switch on the `Developer mode` button in your chrome with the [url](chrome://extensions/).
+#### -- 3, Click the `Load unpacked` button and choose the build folder.
+#### -- 4, You can check the extension in your extension list.
 
 You only need to refresh the extension when you build new changes.
