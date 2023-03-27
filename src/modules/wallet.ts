@@ -2,6 +2,7 @@ import { action, makeObservable, observable } from 'mobx'
 import { GotabitClient } from '@gotabit/client'
 
 import { NetworkStore } from 'src/store/network'
+import { AccountStore } from 'src/store/account'
 
 export class WalletManager {
   @observable
@@ -17,6 +18,12 @@ export class WalletManager {
     makeObservable(this)
     this.account = account
     this.tokens = tokens
+
+    this.queryNativeBalance()
+    this.queryTokenBalance()
+    AccountStore.valueStream.subscribe(({ currentAccount }) => {
+      this.account = currentAccount.account
+    })
   }
 
   public async queryNativeBalance() {

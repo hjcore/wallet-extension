@@ -2,6 +2,9 @@
   "name": "Name",
   "createNewAccount": "Create new account",
   "importExistingAccount": "Import existing account",
+  "inputYourSeed": "Input your seed",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
   "next": "Next",
   "register": "Register"
 }

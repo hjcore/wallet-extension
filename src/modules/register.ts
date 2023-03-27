@@ -8,7 +8,7 @@ import { PrivateMessageRequester } from 'src/services/private'
 
 import { getAccount, persistAccountData } from './helpers/account'
 
-type RegisterStep =
+export type RegisterStep =
   | 'register'
   | 'import'
   | 'create'
@@ -92,8 +92,9 @@ export class RegisterManager {
   async submitKey() {
     if (!this.name || !this.step || !this.key) return
 
-    const { accountList } = await AccountStore.get('accountList')
+    const { accountList = [] } = await AccountStore.get('accountList')
 
+    console.log('----accountList', accountList)
     if (accountList.find(_ => _.name === this.name))
       throw new Error('The account name is already exist!')
 

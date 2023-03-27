@@ -14,20 +14,6 @@ const WalletPage = observer(() => {
   const walletManager = useWallet()
   const navigate = useNavigate()
 
-  const testBrowserMessage = () => {
-    browser.runtime.sendMessage({
-      port: '1000',
-      message: 'test browser send',
-    })
-  }
-
-  const testChromeMessage = () => {
-    chrome.runtime.sendMessage({
-      port: '1000',
-      message: 'test browser send',
-    })
-  }
-
   useEffect(() => {
     browser.runtime.onMessage.addListener((msg, sender) => {
       console.log('=======popup received', msg, sender)
@@ -49,8 +35,6 @@ const WalletPage = observer(() => {
       <p>Wallet page</p>
       <button onClick={handleAddAccount}>Add account</button>
       <Account account={accountManager} wallet={walletManager} />
-      <button onClick={testBrowserMessage}>testBrowserMessage</button>
-      <button onClick={testChromeMessage}>testChromeMessage</button>
     </Box>
   )
 })

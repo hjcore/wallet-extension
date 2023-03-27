@@ -16,6 +16,6 @@ export const AddressBookStore = getBucket<AddressBookStoreData>(
   'local'
 )
 
-export function setDefaultAddressBookData() {
-  AddressBookStore.set({})
+export async function setDefaultAddressBookData() {
+  await AddressBookStore.set({})
 }

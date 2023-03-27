@@ -8,8 +8,6 @@ import { useTranslation } from 'react-i18next'
 
 import { RegisterManager } from 'src/modules/register'
 
-import { generateMnemonic } from './helpers/mnemonic'
-
 type MnemonicLength = 12 | 24
 
 const test_mnemonic =
@@ -18,7 +16,7 @@ const test_mnemonic =
 const getButtonVariant = (isContained: boolean) =>
   isContained ? 'contained' : 'outlined'
 
-const CreateNewAccount = observer(
+const ImportAccount = observer(
   ({ register }: { register: RegisterManager }) => {
     const { t } = useTranslation()
     const [mnemonicLength, setMnemonicLength] = useState<MnemonicLength>(12)
@@ -26,13 +24,13 @@ const CreateNewAccount = observer(
     const [newPassword, setNewPassword] = useState<string>()
     const [confirmPassword, setConfirmPassword] = useState<string>()
 
+    console.log('======11')
     const handleMnemonic = useCallback(
       async (num: MnemonicLength) => {
         setMnemonicLength(num)
-        const mnemonic = await generateMnemonic(num)
 
-        setMnemonic(mnemonic)
-        register.setKey(mnemonic)
+        setMnemonic(test_mnemonic)
+        register.setKey(test_mnemonic)
       },
       [register]
     )
@@ -46,7 +44,8 @@ const CreateNewAccount = observer(
       if (newPassword !== confirmPassword) return
 
       register.setPassword(newPassword)
-      register.setStep('validate')
+      register.submitKey()
+      window.close()
     }
 
     useEffect(() => {
@@ -73,6 +72,11 @@ const CreateNewAccount = observer(
           </Box>
         </Box>
         <Box>{mnemonic}</Box>
+        <FormLabel>{t('register.inputYourSeed')}</FormLabel>
+        <Input
+          value={test_mnemonic}
+          onChange={e => register.setKey(e.target.value)}
+        />
         <Box>
           <FormLabel>{t('register.name')}</FormLabel>
           <Input onChange={e => register.setName(e.target.value)} />
@@ -91,4 +95,4 @@ const CreateNewAccount = observer(
   }
 )
 
-export default CreateNewAccount
+export default ImportAccount

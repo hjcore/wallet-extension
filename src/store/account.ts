@@ -25,8 +25,8 @@ export const AccountEncryptStore = new EncryptBaseStore<AccountStoreData>(
 
 export const AccountStore = getBucket<AccountStoreData>('AccountData', 'local')
 
-export function setDefaultAccountData() {
-  AccountStore.set({
+export async function setDefaultAccountData() {
+  await AccountStore.set({
     currentAccount: {} as any,
     accountList: [],
     walletStatus: WalletStatusEnum.Empty,

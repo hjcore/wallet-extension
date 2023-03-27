@@ -35,12 +35,11 @@ const ValidateMnemonic = observer(
     )
 
     const handleRegisterClick = useCallback(async () => {
-      // if (register.key === useSelections.join(' ')) {
-      register.setPassword('123456')
-      await register.submitKey()
-      window.close()
-      // }
-    }, [register])
+      if (register.key === useSelections.join(' ')) {
+        await register.submitKey()
+        window.close()
+      }
+    }, [register, useSelections])
 
     return (
       <Box>

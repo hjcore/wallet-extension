@@ -22,10 +22,11 @@ function App() {
     !accountList.length
   ) {
     if (window.location.hash !== '#/register') {
-      console.log(window.location.hash)
       browser.tabs.create({
         url: '/index.html#/register',
       })
+
+      return null
     }
   }
 

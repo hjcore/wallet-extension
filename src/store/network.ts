@@ -15,8 +15,8 @@ interface NetworkStoreData {
 
 export const NetworkStore = getBucket<NetworkStoreData>('NetworkData', 'local')
 
-export function setDefaultNetworkData() {
-  NetworkStore.set({
+export async function setDefaultNetworkData() {
+  await NetworkStore.set({
     chainName: DEFAULT_NETWORK.chainName,
     config: getChainConfig(DEFAULT_NETWORK),
     networkList: DEFAULT_NETWORK_LIST,

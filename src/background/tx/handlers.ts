@@ -24,15 +24,18 @@ export class TxClient {
 
     const { currentAccount } = await AccountStore.get()
 
-    const { privateKey } = currentAccount
+    const { mnemonic, privateKey } = currentAccount
 
     const wallet = await LocalWallet.init({
-      privateKey,
+      mnemonic,
     })
 
-    const client = await GotabitClient.init(wallet, config)
+    // TODO: update config
+    const client = await GotabitClient.init(wallet, 'dev')
 
-    return new TxClient(client, wallet)
+    console.log('mnemonic', mnemonic, config)
+
+    return { client, wallet }
   }
 }
 
@@ -56,10 +59,18 @@ export const handlers: TxActions = {
     const signStargateClient = await tx.client.signStargateClient()
 
     BrowserNotification.tx('pending')
+    console.log('---------', {
+      from,
+      to,
+      amount,
+      fee,
+      memo,
+    })
     const result = await signStargateClient
       .signAndBroadcast(from, [msgSendToken], fee, memo)
       .catch((e: Error) => {
         BrowserNotification.tx('error', e.message)
+        console.log('----error', e)
       })
 
     result?.transactionHash && BrowserNotification.tx('success')

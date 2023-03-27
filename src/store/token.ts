@@ -10,8 +10,8 @@ interface TokenStoreData {
 
 export const TokenStore = getBucket<TokenStoreData>('TokenData', 'local')
 
-export function setDefaultTokenData() {
-  TokenStore.set({
+export async function setDefaultTokenData() {
+  await TokenStore.set({
     tokensMap: {},
   })
 }
